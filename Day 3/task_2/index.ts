@@ -1,4 +1,9 @@
-async function SendHttpRequest (url: string): Promise<any> {
+interface ApiResponse  {
+  fact: string,
+  lenght: number;
+}
+
+async function SendHttpRequest (url: string): Promise<ApiResponse> {
     try {
       const response = await fetch(url);
 
@@ -6,7 +11,7 @@ async function SendHttpRequest (url: string): Promise<any> {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data: ApiResponse = await response.json() as ApiResponse;
       return data;
     } 
     catch (error) {
