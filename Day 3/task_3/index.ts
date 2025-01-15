@@ -4,14 +4,15 @@ interface User {
     email: string;
 };
 
+const data: User[] = [
+    {"id": "123", "name": "Alice", "email": "email1@example.com"},
+    {"id": "234", "name": "Bob", "email": "email2@example.com"},
+    {"id": "345", "name": "Jilly", "email": "email3@example.com"},
+];
+
 const festData = (): Promise<User[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            const data: User[] = [
-                {"id": "123", "name": "Alice", "email": "email1@example.com"},
-                {"id": "234", "name": "Bob", "email": "email2@example.com"},
-                {"id": "345", "name": "Jilly", "email": "email3@example.com"},
-            ];
             resolve(data);
         }, 2000);
     });
