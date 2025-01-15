@@ -18,4 +18,7 @@ var data = {
     phone: undefined,
     email: "[alice@example.com](<mailto:alice@example.com>)",
 };
+var test_data = null;
 console.log(countFilledValues(data));
+console.log(countFilledValues(test_data));
+console.log(countFilledValues(test_data));

@@ -24,4 +24,10 @@ const data = {
     email: "[alice@example.com](<mailto:alice@example.com>)",
 };
 
+const test_data = null;
+
 console.log(countFilledValues(data));
+console.log(countFilledValues(test_data));
+console.log(countFilledValues(test_data));
+
+

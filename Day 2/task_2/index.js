@@ -1,13 +1,14 @@
 ;
 ;
 var dataFormatting = function (data) {
+    var user_id = data.user_id, full_name = data.full_name, contact = data.contact, address = data.address, is_active = data.is_active;
     return {
-        id: data.user_id,
-        name: data.full_name,
-        phone: data.contact.phone,
-        email: "[".concat(data.contact.email, "](mailto:").concat(data.contact.email, ")"),
-        location: "".concat(data.address.city, ", ").concat(data.address.zip),
-        status: data.is_active ? "active" : "inactive",
+        id: user_id,
+        name: full_name,
+        phone: contact.phone,
+        email: "[".concat(contact.email, "](mailto:").concat(contact.email, ")"),
+        location: "".concat(address.city, ", ").concat(address.zip),
+        status: is_active ? "active" : "inactive",
     };
 };
 var source = {

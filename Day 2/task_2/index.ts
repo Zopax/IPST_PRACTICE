@@ -22,13 +22,16 @@ interface TargetData {
 };
 
 const dataFormatting = (data: SourceData): TargetData => {
+
+    const { user_id, full_name, contact, address, is_active } = data;
+
     return {
-        id: data.user_id,
-        name: data.full_name,
-        phone: data.contact.phone,
-        email: `[${data.contact.email}](mailto:${data.contact.email})`,
-        location: `${data.address.city}, ${data.address.zip}`,
-        status: data.is_active ? "active" : "inactive",
+        id: user_id,
+        name: full_name,
+        phone: contact.phone,
+        email: `[${contact.email}](mailto:${contact.email})`,
+        location: `${address.city}, ${address.zip}`,
+        status: is_active ? "active" : "inactive",
     };
 };
 

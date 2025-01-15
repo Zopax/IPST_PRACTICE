@@ -1,32 +1,33 @@
-interface SourceData {
-    title: string,
-    year: number,
-    author: string,
-};
-
-interface TargetData {
-    title: string,
-    year: number,
-    author: string,
-    preview: string,
-    url: string,
+interface Book {
+  title: string;
+  year: number;
+  author: string;
 }
 
-function createBook (book: SourceData): TargetData {
-    return {
-        title: book.title,
-        year: book.year,
-        author: book.author,
-        preview: `Название: ${book.title}, Автор: ${book.author}, Год: ${book.year}`,
-        url: `www.someurl.com/preview?title=${book.title}&year=${book.year}&author=${book.author}`,
-    };
-};
+interface BookWithPreviewAndUrl extends Book {
+  preview: string;
+  url: string;
+}
 
-const book: SourceData = {
+function createBook(book: Book): BookWithPreviewAndUrl {
+  const { title, year, author } = book;
+
+
+  const preview = `Название: ${title}, Автор: ${author}, Год: ${year}`;
+  const url = `www.someurl.com/preview?title=${title}&year=${year}&author=${author}`;
+
+  return {
+    ...book,
+    preview,
+    url,
+  };
+}
+
+const book: Book = {
   title: "Harry Potter",
   year: 1997,
   author: "J.K. Rowling",
 };
 
-const target: TargetData = createBook(book);
+const target: BookWithPreviewAndUrl = createBook(book);
 console.log(target);
