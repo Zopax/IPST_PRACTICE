@@ -1,0 +1,265 @@
+/todo:
+  post:
+    tags:
+      - To-Do
+    summary: Create a new to-do item
+    security: 
+      - bearer: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [title, creatorId]
+            properties:
+              title:
+                type: string
+                example: "Buy groceries"
+              description:
+                type: string
+                example: "Milk, bread, eggs"
+              creatorId:
+                type: string
+                format: uuid
+                example: "550e8400-e29b-41d4-a716-446655440000"
+              notifyAt:
+                type: string
+                format: date-time
+                example: "2023-10-01T12:00:00Z"
+              isCompleted:
+                type: boolean
+                example: false
+    responses:
+      201:
+        description: Created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                title:
+                  type: string
+                  example: "Buy groceries"
+                description:
+                  type: string
+                  example: "Milk, bread, eggs"
+                creatorId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                notifyAt:
+                  type: string
+                  format: date-time
+                  example: "2023-10-01T12:00:00Z"
+                isCompleted:
+                  type: boolean
+                  example: false
+      400:
+        $ref: "#/definitions/400"
+      401:
+        $ref: "#/definitions/401"
+      422:
+        $ref: "#/definitions/422"
+
+  get:
+    tags:
+      - To-Do
+    summary: Get all to-do items with pagination, sorting, and filtering
+    security: 
+      - bearer: []
+    parameters:
+      - $ref: "#/definitions/pagination/limit"
+      - $ref: "#/definitions/pagination/offset"
+      - $ref: "#/definitions/sort_by"
+      - $ref: "#/definitions/order_by"
+      - name: search
+        in: query
+        description: Search by title
+        required: false
+        schema:
+          type: string
+      - name: isCompleted
+        in: query
+        description: Filter by completion status
+        required: false
+        schema:
+          type: boolean
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+                  title:
+                    type: string
+                    example: "Buy groceries"
+                  description:
+                    type: string
+                    example: "Milk, bread, eggs"
+                  creatorId:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+                  notifyAt:
+                    type: string
+                    format: date-time
+                    example: "2023-10-01T12:00:00Z"
+                  isCompleted:
+                    type: boolean
+                    example: false
+      400:
+        $ref: "#/definitions/400"
+      401:
+        $ref: "#/definitions/401"
+      404:
+        $ref: "#/definitions/404"
+
+/todo/{id}:
+  get:
+    tags:
+      - To-Do
+    summary: Get a to-do item by ID
+    security: 
+      - bearer: []
+    parameters:
+      - $ref: "#/definitions/uuid-param"
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                title:
+                  type: string
+                  example: "Buy groceries"
+                description:
+                  type: string
+                  example: "Milk, bread, eggs"
+                creatorId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                notifyAt:
+                  type: string
+                  format: date-time
+                  example: "2023-10-01T12:00:00Z"
+                isCompleted:
+                  type: boolean
+                  example: false
+      400:
+        $ref: "#/definitions/400"
+      401:
+        $ref: "#/definitions/401"
+      404:
+        $ref: "#/definitions/404"
+
+  patch:
+    tags:
+      - To-Do
+    summary: Update a to-do item by ID
+    security: 
+      - bearer: []
+    parameters:
+      - $ref: "#/definitions/uuid-param"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: "Buy groceries"
+              description:
+                type: string
+                example: "Milk, bread, eggs"
+              notifyAt:
+                type: string
+                format: date-time
+                example: "2023-10-01T12:00:00Z"
+              isCompleted:
+                type: boolean
+                example: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                title:
+                  type: string
+                  example: "Buy groceries"
+                description:
+                  type: string
+                  example: "Milk, bread, eggs"
+                creatorId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                notifyAt:
+                  type: string
+                  format: date-time
+                  example: "2023-10-01T12:00:00Z"
+                isCompleted:
+                  type: boolean
+                  example: true
+      400:
+        $ref: "#/definitions/400"
+      401:
+        $ref: "#/definitions/401"
+      404:
+        $ref: "#/definitions/404"
+      422:
+        $ref: "#/definitions/422"
+
+  delete:
+    tags:
+      - To-Do
+    summary: Delete a to-do item by ID
+    security: 
+      - bearer: []
+    parameters:
+      - $ref: "#/definitions/uuid-param"
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "To-do item deleted successfully"
+      400:
+        $ref: "#/definitions/400"
+      401:
+        $ref: "#/definitions/401"
+      422:
+        $ref: "#/definitions/422"
