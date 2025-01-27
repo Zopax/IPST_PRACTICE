@@ -15,14 +15,8 @@ const getAllTodosSchema = z.object({
     ),
     sortBy: z.enum(['title', 'createdAt', 'notifyAt']).optional(),
     sortOrder: z.enum(['asc', 'desc']).optional(),
-    limit: z.preprocess(
-        (val) => (typeof val === "string" ? parseInt(val, 10) : val),
-        z.number().int().positive().optional()
-    ),
-    offset: z.preprocess(
-        (val) => (typeof val === "string" ? parseInt(val, 10) : val),
-        z.number().int().nonnegative().optional()
-    ),
+    limit: z.coerce.number().int().positive().optional().default(10),
+    offset: z.coerce.number().int().nonnegative().optional().default(0),
 });
 
 export type getAllTodosSchema = z.infer<typeof getAllTodosSchema>;

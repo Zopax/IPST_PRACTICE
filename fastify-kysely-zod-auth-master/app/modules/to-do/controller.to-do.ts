@@ -8,12 +8,7 @@ import type { IHandlingResponseError } from "../../common/config/http-response";
 import { HandlingErrorType } from "../../common/enum/error-types";
 
 export async function create(req: FastifyRequest<{ Body: createTodoSchema }>, rep: FastifyReply) {
-    const creatorId = req.user.id;
-
-    if (!creatorId) {
-        const info: IHandlingResponseError = { type: HandlingErrorType.Unauthorized, property: "user" };
-        return rep.code(HttpStatusCode.UNAUTHORIZED).send(info);
-    }
+    const creatorId = req.user.id as string;
 
     const newTodo = {
         ...req.body,
@@ -41,12 +36,7 @@ export async function getById(
 }
 
 export async function getAll(req: FastifyRequest, rep: FastifyReply) {
-    const creatorId = req.user?.id;
-
-    if (creatorId === undefined) {
-        const info: IHandlingResponseError = { type: HandlingErrorType.Unauthorized, property: "user" };
-        return rep.code(HttpStatusCode.UNAUTHORIZED).send(info);
-    }
+    const creatorId = req.user?.id as string;
 
     const { search, isCompleted, sortBy, sortOrder, limit, offset } = req.query as {
         search?: string;
@@ -57,24 +47,18 @@ export async function getAll(req: FastifyRequest, rep: FastifyReply) {
         offset?: number;
     };
 
-    try {
-        const todos = await todoRepository.getAllWithQuery(
-            sqlCon,
-            creatorId,
-            search,
-            isCompleted,
-            sortBy,
-            sortOrder,
-            limit,
-            offset
-        );
-        return rep.code(HttpStatusCode.OK).send(todos);
-    } catch (error) {
-        const info: IHandlingResponseError = { type: HandlingErrorType.InternalServerError, property: "server" };
-        return rep.code(HttpStatusCode.INTERNAL_SERVER_ERROR).send(info);
-    }
+    const todos = await todoRepository.getAllWithQuery(
+        sqlCon,
+        creatorId,
+        search,
+        isCompleted,
+        sortBy,
+        sortOrder,
+        limit,
+        offset
+    );
+    return rep.code(HttpStatusCode.OK).send(todos);
 }
-
 
 export async function update(
     req: FastifyRequest<{ Params: { id: string }; Body: updateTodoSchema }>,
@@ -82,15 +66,13 @@ export async function update(
 ) {
     const { id } = req.params;
     const updatedTodo = await todoRepository.update(sqlCon, id, req.body);
-
     return rep.code(HttpStatusCode.OK).send(updatedTodo);
 }
 
-
 export async function remove(req: FastifyRequest<{ Params: { id: string } }>, rep: FastifyReply) {
     const { id } = req.params;
-      const removedTodo = await todoRepository.remove(sqlCon, id);
-      if (!removedTodo) {
+    const removedTodo = await todoRepository.remove(sqlCon, id);
+    if (!removedTodo) {
         const info: IHandlingResponseError = { type: HandlingErrorType.Found, property: "id" };
         return rep.code(HttpStatusCode.NOT_FOUND).send(info);
     }

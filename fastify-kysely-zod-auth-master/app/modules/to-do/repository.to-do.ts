@@ -1,4 +1,4 @@
-import { type Insertable, type Kysely, Transaction, type Selectable, sql } from "kysely";
+import { type Insertable, type Kysely, Transaction, type Selectable, sql, ExpressionBuilder } from "kysely";
 import { DB, Objectives } from "../../common/types/kysely/db.type";
 
 type InsertableObjectiveRowType = Insertable<Objectives>;
@@ -68,30 +68,28 @@ export async function getAllWithQuery(
     limit: number = 10,
     offset: number = 0,
 ): Promise<SelectableObjectiveRowType[]> {
-    let q = con.selectFrom("objectives")
+    const conditions = (eb: ExpressionBuilder<DB, 'objectives'>) => {
+        const expressions = [
+            eb('creatorId', '=', userId),
+        ];
+
+        if (search) {
+            expressions.push(eb('title', 'ilike', `%${search}%`));
+        }
+
+        if (isCompleted !== undefined) {
+            expressions.push(eb('isCompleted', '=', isCompleted));
+        }
+
+        return eb.and(expressions);
+    };
+
+    const query = con.selectFrom("objectives")
         .selectAll()
-        .where("creatorId", "=", userId);
+        .where(conditions)
+        .orderBy(sortBy, sortOrder)
+        .limit(limit)
+        .offset(offset);
 
-    if (search) {
-        q = q.where("title", "like", `%${search}%`);
-    }
-
-    if (isCompleted !== undefined) {
-        q = q.where("isCompleted", "=", isCompleted);
-    }
-
-    const allowedSortColumns = ['title', 'createdAt', 'notifyAt'];
-    if (!allowedSortColumns.includes(sortBy)) {
-        throw new Error(`Invalid sortBy value: ${sortBy}`);
-    }
-
-    if (sortOrder !== 'asc' && sortOrder !== 'desc') {
-        throw new Error(`Invalid sortOrder value: ${sortOrder}`);
-    }
-
-    q = q.orderBy(sortBy, sortOrder);
-
-    q = q.limit(limit).offset(offset);
-
-    return await q.execute();
+    return await query.execute();
 }
