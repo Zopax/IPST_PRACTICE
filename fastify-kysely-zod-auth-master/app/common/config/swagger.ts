@@ -22,7 +22,7 @@ const swaggerDocument = SwaggerJSDoc({
                 bearer: { type: "http", scheme: "bearer", bearerFormat: "JWT" }
             }
         },
-        security: [{ bearer: [] }],
+        security: [{ bearer: [] }]
     },
     apis: [`${process.cwd()}/external/docs/**/*.yaml`]
 });

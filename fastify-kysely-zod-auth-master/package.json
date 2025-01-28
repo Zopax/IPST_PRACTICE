@@ -10,7 +10,9 @@
     "sql:codegen": "npx kysely-codegen --out-file ./app/common/types/kysely/db.type.ts",
     "bun:start:local": "bun -r dotenv/config --watch app/main.ts",
     "bun:sql:codegen": "bun x kysely-codegen --out-file ./app/common/types/kysely/db.type.ts",
-    "bun:sql:migrate": "bun -r dotenv/config app/common/helpers/run-migrations.ts dotenv_config_path=./.env"
+    "bun:sql:migrate": "bun -r dotenv/config app/common/helpers/run-migrations.ts dotenv_config_path=./.env",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

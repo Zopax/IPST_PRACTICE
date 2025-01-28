@@ -1,11 +1,12 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
+import type { IHandlingResponseError } from "../../common/config/http-response";
 import { sqlCon } from "../../common/config/kysely-config";
+import { HandlingErrorType } from "../../common/enum/error-types";
 import { HttpStatusCode } from "../../common/enum/http-status-code";
 import * as todoRepository from "./repository.to-do";
 import type { createTodoSchema } from "./schemas/create.schema";
+import { getAllTodosSchema } from "./schemas/get-all-to-do.schema";
 import type { updateTodoSchema } from "./schemas/update.schema";
-import type { IHandlingResponseError } from "../../common/config/http-response";
-import { HandlingErrorType } from "../../common/enum/error-types";
 
 export async function create(req: FastifyRequest<{ Body: createTodoSchema }>, rep: FastifyReply) {
     const creatorId = req.user.id as string;
@@ -15,17 +16,14 @@ export async function create(req: FastifyRequest<{ Body: createTodoSchema }>, re
         creatorId,
         createdAt: new Date(),
         updatedAt: new Date(),
-        isCompleted: false,
+        isCompleted: false
     };
 
     const insertedTodo = await todoRepository.insert(sqlCon, newTodo);
     return rep.code(HttpStatusCode.CREATED).send(insertedTodo);
 }
 
-export async function getById(
-    req: FastifyRequest<{ Params: { id: string } }>,
-    rep: FastifyReply
-) {
+export async function getById(req: FastifyRequest<{ Params: { id: string } }>, rep: FastifyReply) {
     const { id } = req.params;
     const todo = await todoRepository.getByIdWithCreator(sqlCon, id);
     if (!todo) {
@@ -35,35 +33,15 @@ export async function getById(
     return rep.code(HttpStatusCode.OK).send(todo);
 }
 
-export async function getAll(req: FastifyRequest, rep: FastifyReply) {
+export async function getAll(req: FastifyRequest<{ Querystring: getAllTodosSchema }>, rep: FastifyReply) {
     const creatorId = req.user?.id as string;
 
-    const { search, isCompleted, sortBy, sortOrder, limit, offset } = req.query as {
-        search?: string;
-        isCompleted?: boolean;
-        sortBy?: 'title' | 'createdAt' | 'notifyAt';
-        sortOrder?: 'asc' | 'desc';
-        limit?: number;
-        offset?: number;
-    };
+    const todos = await todoRepository.getAllWithQuery(sqlCon, creatorId, req.query);
 
-    const todos = await todoRepository.getAllWithQuery(
-        sqlCon,
-        creatorId,
-        search,
-        isCompleted,
-        sortBy,
-        sortOrder,
-        limit,
-        offset
-    );
     return rep.code(HttpStatusCode.OK).send(todos);
 }
 
-export async function update(
-    req: FastifyRequest<{ Params: { id: string }; Body: updateTodoSchema }>,
-    rep: FastifyReply
-) {
+export async function update(req: FastifyRequest<{ Params: { id: string }; Body: updateTodoSchema }>, rep: FastifyReply) {
     const { id } = req.params;
     const updatedTodo = await todoRepository.update(sqlCon, id, req.body);
     return rep.code(HttpStatusCode.OK).send(updatedTodo);

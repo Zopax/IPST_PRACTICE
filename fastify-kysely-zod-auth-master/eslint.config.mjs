@@ -30,6 +30,7 @@ export default [
             "@typescript-eslint/ban-types": "off",
             "@typescript-eslint/ban-ts-comment": "off",
             "@typescript-eslint/no-explicit-any": "off"
-        }
+        },
+        ignores: ["build/**/*"]
     }
 ];
