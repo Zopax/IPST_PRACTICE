@@ -1,8 +1,9 @@
-import { ExpressionBuilder, type Insertable, type Kysely, type Selectable, sql, Transaction } from "kysely";
-import { DB, Objectives } from "../../common/types/kysely/db.type";
+import { ExpressionBuilder, type Insertable, type Kysely, type Selectable, Transaction } from "kysely";
+import { DB, Objectives, UserObjectiveShares } from "../../common/types/kysely/db.type";
 import { getAllTodosSchema } from "./schemas/get-all-to-do.schema";
 
 type InsertableObjectiveRowType = Insertable<Objectives>;
+type UserObjectiveSharesRowType = Insertable<UserObjectiveShares>;
 type SelectableObjectiveRowType = Selectable<Objectives>;
 
 export async function insert(con: Kysely<DB> | Transaction<DB>, entity: InsertableObjectiveRowType) {
@@ -18,10 +19,11 @@ export async function getByIdWithCreator(con: Kysely<DB> | Transaction<DB>, id: 
         .selectFrom("objectives")
         .innerJoin("users", "users.id", "objectives.creatorId")
         .selectAll("objectives")
-        .select(sql<string>`users.name`.as("creatorName"))
+        .select("users.name as creatorName")
         .where("objectives.id", "=", id)
         .executeTakeFirstOrThrow();
 }
+
 export async function getAllByUserId(con: Kysely<DB> | Transaction<DB>, userId: string): Promise<SelectableObjectiveRowType[]> {
     return await con.selectFrom("objectives").selectAll().where("creatorId", "=", userId).execute();
 }
@@ -49,18 +51,19 @@ export async function getAllWithQuery(con: Kysely<DB>, userId: string, queryPara
         return eb.and(expressions);
     };
 
-    const sortBy = queryParams.sortBy || "createdAt";
-    const sortOrder = queryParams.sortOrder || "asc";
-    const limit = queryParams.limit || 10;
-    const offset = queryParams.offset || 0;
-
-    const query = con.selectFrom("objectives").selectAll().where(conditions).orderBy(sortBy, sortOrder).limit(limit).offset(offset);
+    const query = con
+        .selectFrom("objectives")
+        .selectAll()
+        .where(conditions)
+        .orderBy(queryParams.sortBy, queryParams.sortOrder)
+        .limit(queryParams.limit)
+        .offset(queryParams.offset);
 
     return await query.execute();
 }
 
-export async function shareTodo(con: Kysely<DB>, objectiveId: string, userId: string) {
-    return await con.insertInto("user_objective_shares").values({ userId, objectiveId }).returningAll().executeTakeFirstOrThrow();
+export async function shareTodo(con: Kysely<DB> | Transaction<DB>, entity: UserObjectiveSharesRowType) {
+    return await con.insertInto("user_objective_shares").values(entity).returningAll().executeTakeFirstOrThrow();
 }
 
 export async function revokeAccess(con: Kysely<DB>, objectiveId: string, userId: string) {
@@ -74,4 +77,15 @@ export async function listGrants(con: Kysely<DB>, objectiveId: string) {
         .select(["users.id", "users.name", "users.email"])
         .where("objectiveId", "=", objectiveId)
         .execute();
+}
+
+export async function hasAccessToObjective(con: Kysely<DB>, objectiveId: string, userId: string): Promise<boolean> {
+    const access = await con
+        .selectFrom("user_objective_shares")
+        .select("id")
+        .where("objectiveId", "=", objectiveId)
+        .where("userId", "=", userId)
+        .executeTakeFirst();
+
+    return !!access;
 }

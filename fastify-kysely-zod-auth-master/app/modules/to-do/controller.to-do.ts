@@ -3,11 +3,16 @@ import type { IHandlingResponseError } from "../../common/config/http-response";
 import { sqlCon } from "../../common/config/kysely-config";
 import { HandlingErrorType } from "../../common/enum/error-types";
 import { HttpStatusCode } from "../../common/enum/http-status-code";
-import { sendEmailNotification } from "./mailer";
+import { sendEmailNotification } from "../../common/config/mailer";
 import * as todoRepository from "./repository.to-do";
 import type { createTodoSchema } from "./schemas/create.schema";
 import { getAllTodosSchema } from "./schemas/get-all-to-do.schema";
 import type { updateTodoSchema } from "./schemas/update.schema";
+import { RemoveTodoSchema } from "./schemas/remove-to-do.schema";
+import { ShareTodoSchema } from "./schemas/share-to-do.schema";
+import { RevokeAccessSchema } from "./schemas/revoke-access-to-do.schema";
+import { ListGrantsSchema } from "./schemas/list-grants-to-do.schema";
+import * as userRepository from "../user/repository.user";
 
 export async function create(req: FastifyRequest<{ Body: createTodoSchema }>, rep: FastifyReply) {
     const creatorId = req.user.id as string;
@@ -35,9 +40,10 @@ export async function getById(req: FastifyRequest<{ Params: { id: string } }>, r
         return rep.code(HttpStatusCode.NOT_FOUND).send(info);
     }
 
-    const hasAccess = await sqlCon.selectFrom("user_objective_shares").select("id").where("objectiveId", "=", id).where("userId", "=", userId).executeTakeFirst();
+    const isCreator = todo.creatorId === userId;
+    const hasAccess = isCreator ? true : await todoRepository.hasAccessToObjective(sqlCon, id, userId);
 
-    if (todo.creatorId !== userId && !hasAccess) {
+    if (!hasAccess) {
         const info: IHandlingResponseError = { type: HandlingErrorType.Permission, property: "id" };
         return rep.code(HttpStatusCode.FORBIDDEN).send(info);
     }
@@ -59,7 +65,7 @@ export async function update(req: FastifyRequest<{ Params: { id: string }; Body:
     return rep.code(HttpStatusCode.OK).send(updatedTodo);
 }
 
-export async function remove(req: FastifyRequest<{ Params: { id: string } }>, rep: FastifyReply) {
+export async function remove(req: FastifyRequest<{ Params: RemoveTodoSchema }>, rep: FastifyReply) {
     const { id } = req.params;
     const removedTodo = await todoRepository.remove(sqlCon, id);
     if (!removedTodo) {
@@ -69,20 +75,29 @@ export async function remove(req: FastifyRequest<{ Params: { id: string } }>, re
     return rep.code(HttpStatusCode.OK).send(removedTodo);
 }
 
-export async function shareTodo(req: FastifyRequest<{ Params: { id: string }; Body: { userId: string } }>, rep: FastifyReply) {
+export async function shareTodo(req: FastifyRequest<{ Params: { id: string }; Body: ShareTodoSchema }>, rep: FastifyReply) {
     const { id } = req.params;
     const { userId } = req.body;
 
-    const sharedTodo = await todoRepository.shareTodo(sqlCon, id, userId);
-    const user = await sqlCon.selectFrom("users").select("email").where("id", "=", userId).executeTakeFirstOrThrow();
-    const todo = await sqlCon.selectFrom("objectives").select("title").where("id", "=", id).executeTakeFirstOrThrow();
+    const shareEntity = {
+        objectiveId: id,
+        userId: userId,
+    };
 
-    await sendEmailNotification(user.email, todo.title);
+    const sharedTodo = await sqlCon.transaction().execute(async (trx) => {
+        const sharedTodo = await todoRepository.shareTodo(trx, shareEntity);
+        const userEmail = (await userRepository.getById(trx, userId)).email;
+        const todoTitle = (await todoRepository.getById(trx, id)).title;
+
+        await sendEmailNotification(userEmail, todoTitle);
+
+        return sharedTodo;
+    });
 
     return rep.code(HttpStatusCode.CREATED).send(sharedTodo);
 }
 
-export async function revokeAccess(req: FastifyRequest<{ Params: { id: string }; Body: { userId: string } }>, rep: FastifyReply) {
+export async function revokeAccess(req: FastifyRequest<{ Params: { id: string }; Body: RevokeAccessSchema }>, rep: FastifyReply) {
     const { id } = req.params;
     const { userId } = req.body;
 
@@ -90,7 +105,7 @@ export async function revokeAccess(req: FastifyRequest<{ Params: { id: string };
     return rep.code(HttpStatusCode.OK).send(revokedAccess);
 }
 
-export async function listGrants(req: FastifyRequest<{ Params: { id: string } }>, rep: FastifyReply) {
+export async function listGrants(req: FastifyRequest<{ Params: ListGrantsSchema }>, rep: FastifyReply) {
     const { id } = req.params;
 
     const grants = await todoRepository.listGrants(sqlCon, id);

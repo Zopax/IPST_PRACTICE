@@ -1,0 +1,465 @@
+{
+	"info": {
+		"_postman_id": "17a279ab-3055-48de-9bf0-519aeac59d26",
+		"name": "IPST",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26493545"
+	},
+	"item": [
+		{
+			"name": "with auth",
+			"item": [
+				{
+					"name": "Me GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/users/me",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create todo POST",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"eg3gf3f3beb\",\r\n  \"description\": \"dfbdb\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all todos GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get todo by id GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/9f50bd6d-fddb-4fdc-b5f1-cbe4a835695a",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"9f50bd6d-fddb-4fdc-b5f1-cbe4a835695a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update todo PATCH",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Updated task title\",\r\n  \"isCompleted\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/9f50bd6d-fddb-4fdc-b5f1-cbe4a835695a",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"9f50bd6d-fddb-4fdc-b5f1-cbe4a835695a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete todo DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/b455e821-739e-4dfe-82f5-95468089a2b0",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"b455e821-739e-4dfe-82f5-95468089a2b0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get todo by name GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}?search=fgntnrtnr",
+							"host": [
+								"{{localhost}}"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "fgntnrtnr"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sort by isCompleted GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}?isCompleted=false",
+							"host": [
+								"{{localhost}}"
+							],
+							"query": [
+								{
+									"key": "isCompleted",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get sorted by date GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}?sortOrder=desc&sortBy=createdAt",
+							"host": [
+								"{{localhost}}"
+							],
+							"query": [
+								{
+									"key": "sortOrder",
+									"value": "desc"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdAt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get todos with paginate GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}?limit=2&offset=1",
+							"host": [
+								"{{localhost}}"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "offset",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get notifyAt GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}?sortOrder=asc&sortBy=notifyAt",
+							"host": [
+								"{{localhost}}"
+							],
+							"query": [
+								{
+									"key": "sortOrder",
+									"value": "asc"
+								},
+								{
+									"key": "sortBy",
+									"value": "notifyAt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "share obj POST",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": \"64dfa8f3-2a5e-45a6-b44e-736763a85aa2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/{{objectiveID}}/share",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"{{objectiveID}}",
+								"share"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list grants for todo GET",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/{{objectiveID}}/list-grants",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"{{objectiveID}}",
+								"list-grants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke grants DELETE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": \"1e624c98-94af-4a9b-bebd-da9ab95df83d\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localhost}}/{{objectiveID}}/revoke",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"{{objectiveID}}",
+								"revoke"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{accessToken}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Register POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"login\": \"test3\",\r\n  \"name\": \"test3\",\r\n  \"email\": \"a4piagame@gmail.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{localhostUser}}/users/sign-up",
+					"host": [
+						"{{localhostUser}}"
+					],
+					"path": [
+						"users",
+						"sign-up"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login POST",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Авторизация успешна\", function () {\r",
+							"    pm.response.to.be.success;\r",
+							"});\r",
+							"\r",
+							"let jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);\r",
+							"\r",
+							"console.log(\"Токен доступа сохранен в переменной среды: \" + pm.environment.get(\"accessToken\"));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"test1@gmail.com\",\r\n    \"password\": \"123456\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{localhostUser}}/users/login",
+					"host": [
+						"{{localhostUser}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.environment.set(\"localhost\", \"127.0.0.1:8000/todos\");\r",
+					"pm.environment.set(\"localhostUser\", \"127.0.0.1:8000\");\r",
+					"pm.environment.set(\"objectiveID\", \"ccbe497c-9d84-4690-88cd-93fbd4702f2c\");"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "accessToken",
+			"value": ""
+		}
+	]
+}
