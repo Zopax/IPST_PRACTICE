@@ -58,3 +58,20 @@ export async function getAllWithQuery(con: Kysely<DB>, userId: string, queryPara
 
     return await query.execute();
 }
+
+export async function shareTodo(con: Kysely<DB>, objectiveId: string, userId: string) {
+    return await con.insertInto("user_objective_shares").values({ userId, objectiveId }).returningAll().executeTakeFirstOrThrow();
+}
+
+export async function revokeAccess(con: Kysely<DB>, objectiveId: string, userId: string) {
+    return await con.deleteFrom("user_objective_shares").where("objectiveId", "=", objectiveId).where("userId", "=", userId).returningAll().executeTakeFirstOrThrow();
+}
+
+export async function listGrants(con: Kysely<DB>, objectiveId: string) {
+    return await con
+        .selectFrom("user_objective_shares")
+        .innerJoin("users", "users.id", "user_objective_shares.userId")
+        .select(["users.id", "users.name", "users.email"])
+        .where("objectiveId", "=", objectiveId)
+        .execute();
+}

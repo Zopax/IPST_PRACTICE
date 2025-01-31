@@ -18,5 +18,6 @@ export enum HandlingErrorType {
     Exists = "not_exists",
     Match = "not_match",
     Unauthorized = "Unauthorized",
-    InternalServerError = "InternalServerError"
+    InternalServerError = "InternalServerError",
+    Permission = "permission_denied"
 }

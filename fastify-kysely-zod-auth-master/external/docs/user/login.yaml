@@ -1,4 +1,4 @@
-/user/login:
+/users/login:
   post:
     tags:
       - User

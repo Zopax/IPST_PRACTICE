@@ -8,6 +8,6 @@ interface IProvider {
 }
 
 export const HttpProvider: IProvider[] = [
-    { instance: userRouter, prefix: "user" },
-    { instance: todoRouter, prefix: "todo" }
+    { instance: userRouter, prefix: "users" },
+    { instance: todoRouter, prefix: "todos" }
 ];
