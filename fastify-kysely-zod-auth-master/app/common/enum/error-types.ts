@@ -19,5 +19,6 @@ export enum HandlingErrorType {
     Match = "not_match",
     Unauthorized = "Unauthorized",
     InternalServerError = "InternalServerError",
-    Permission = "permission_denied"
+    Permission = "permission_denied",
+    Validation = "Validation"
 }

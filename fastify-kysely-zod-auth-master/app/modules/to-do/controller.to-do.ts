@@ -1,18 +1,19 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { IHandlingResponseError } from "../../common/config/http-response";
 import { sqlCon } from "../../common/config/kysely-config";
+import { sendEmailNotification } from "../../common/config/mailer";
 import { HandlingErrorType } from "../../common/enum/error-types";
 import { HttpStatusCode } from "../../common/enum/http-status-code";
-import { sendEmailNotification } from "../../common/config/mailer";
+import * as userRepository from "../user/repository.user";
 import * as todoRepository from "./repository.to-do";
 import type { createTodoSchema } from "./schemas/create.schema";
 import { getAllTodosSchema } from "./schemas/get-all-to-do.schema";
-import type { updateTodoSchema } from "./schemas/update.schema";
-import { RemoveTodoSchema } from "./schemas/remove-to-do.schema";
-import { ShareTodoSchema } from "./schemas/share-to-do.schema";
-import { RevokeAccessSchema } from "./schemas/revoke-access-to-do.schema";
 import { ListGrantsSchema } from "./schemas/list-grants-to-do.schema";
-import * as userRepository from "../user/repository.user";
+import { RemoveTodoSchema } from "./schemas/remove-to-do.schema";
+import { RevokeAccessSchema } from "./schemas/revoke-access-to-do.schema";
+import { ShareTodoSchema } from "./schemas/share-to-do.schema";
+import type { UpdateTodoSchema } from "./schemas/update.schema";
+import { uuidSchema } from "./schemas/uuid.schema";
 
 export async function create(req: FastifyRequest<{ Body: createTodoSchema }>, rep: FastifyReply) {
     const creatorId = req.user.id as string;
@@ -20,8 +21,6 @@ export async function create(req: FastifyRequest<{ Body: createTodoSchema }>, re
     const newTodo = {
         ...req.body,
         creatorId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
         isCompleted: false
     };
 
@@ -31,21 +30,17 @@ export async function create(req: FastifyRequest<{ Body: createTodoSchema }>, re
 
 export async function getById(req: FastifyRequest<{ Params: { id: string } }>, rep: FastifyReply) {
     const { id } = req.params;
-    const userId = req.user.id as string;
+
+    if (req.user.id === undefined) {
+        const info: IHandlingResponseError = { type: HandlingErrorType.Found, property: "userId", message: "User ID is missing" };
+        return rep.code(HttpStatusCode.UNAUTHORIZED).send(info);
+    }
 
     const todo = await todoRepository.getByIdWithCreator(sqlCon, id);
 
     if (!todo) {
         const info: IHandlingResponseError = { type: HandlingErrorType.Found, property: "id" };
         return rep.code(HttpStatusCode.NOT_FOUND).send(info);
-    }
-
-    const isCreator = todo.creatorId === userId;
-    const hasAccess = isCreator ? true : await todoRepository.hasAccessToObjective(sqlCon, id, userId);
-
-    if (!hasAccess) {
-        const info: IHandlingResponseError = { type: HandlingErrorType.Permission, property: "id" };
-        return rep.code(HttpStatusCode.FORBIDDEN).send(info);
     }
 
     return rep.code(HttpStatusCode.OK).send(todo);
@@ -59,8 +54,16 @@ export async function getAll(req: FastifyRequest<{ Querystring: getAllTodosSchem
     return rep.code(HttpStatusCode.OK).send(todos);
 }
 
-export async function update(req: FastifyRequest<{ Params: { id: string }; Body: updateTodoSchema }>, rep: FastifyReply) {
+export async function update(req: FastifyRequest<{ Params: { id: string }; Body: UpdateTodoSchema }>, rep: FastifyReply) {
     const { id } = req.params;
+
+    try {
+        uuidSchema.parse(id);
+    } catch (error) {
+        const info: IHandlingResponseError = { type: HandlingErrorType.Validation, property: "id", message: "Invalid UUID format" };
+        return rep.code(HttpStatusCode.BAD_REQUEST).send(info);
+    }
+
     const updatedTodo = await todoRepository.update(sqlCon, id, req.body);
     return rep.code(HttpStatusCode.OK).send(updatedTodo);
 }
@@ -79,9 +82,16 @@ export async function shareTodo(req: FastifyRequest<{ Params: { id: string }; Bo
     const { id } = req.params;
     const { userId } = req.body;
 
+    try {
+        uuidSchema.parse(id);
+    } catch (error) {
+        const info: IHandlingResponseError = { type: HandlingErrorType.Validation, property: "id", message: "Invalid UUID format" };
+        return rep.code(HttpStatusCode.BAD_REQUEST).send(info);
+    }
+
     const shareEntity = {
         objectiveId: id,
-        userId: userId,
+        userId: userId
     };
 
     const sharedTodo = await sqlCon.transaction().execute(async (trx) => {

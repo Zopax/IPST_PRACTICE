@@ -1,8 +1,9 @@
-import { z } from "zod";
 import type { FastifySchema } from "fastify";
+import { z } from "zod";
+import { uuidSchema } from "./uuid.schema";
 
 export const listGrantsSchema = z.object({
-    id: z.string().uuid(),
+    id: uuidSchema
 });
 
 export type ListGrantsSchema = z.infer<typeof listGrantsSchema>;

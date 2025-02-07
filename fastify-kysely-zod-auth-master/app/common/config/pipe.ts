@@ -1,6 +1,7 @@
 import { errorCodes, type FastifyError, type FastifyReply, type FastifyRequest } from "fastify";
 import { z, ZodError, ZodObject } from "zod";
 import { HttpStatusCode } from "../enum/http-status-code";
+import { AccessDeniedException } from "../exceptions/access-denied.exception";
 import { CustomException } from "../exceptions/custom-exception";
 import { logger } from "./pino-plugin";
 
@@ -27,6 +28,11 @@ export async function AppErrorPipe(err: any, req: FastifyRequest, reply: Fastify
             reply.send(err.publicMessage);
         }
 
+        return;
+    }
+
+    if (err instanceof AccessDeniedException) {
+        reply.code(HttpStatusCode.FORBIDDEN).send({ message: "Access denied" });
         return;
     }
 

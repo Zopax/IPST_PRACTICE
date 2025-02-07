@@ -1,9 +1,10 @@
 import type { FastifySchema } from "fastify";
 import { z } from "zod";
+import { uuidSchema } from "./uuid.schema";
 
-const getTodoByIdSchema = z.object({
-    id: z.string().uuid()
+export const getTodoByIdSchema = z.object({
+    id: uuidSchema
 });
 
-export type getTodoByIdSchema = z.infer<typeof getTodoByIdSchema>;
+export type GetTodoByIdSchema = z.infer<typeof getTodoByIdSchema>;
 export const getTodoByIdFSchema: FastifySchema = { params: getTodoByIdSchema };

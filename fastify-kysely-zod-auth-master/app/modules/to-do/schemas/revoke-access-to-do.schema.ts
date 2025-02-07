@@ -1,15 +1,18 @@
-import { z } from "zod";
 import type { FastifySchema } from "fastify";
+import { z } from "zod";
+import { uuidSchema } from "./uuid.schema";
+
+export const todoIdParamsSchema = z.object({
+    id: uuidSchema
+});
 
 export const revokeAccessSchema = z.object({
-    userId: z.string().uuid(),
+    userId: uuidSchema
 });
 
 export type RevokeAccessSchema = z.infer<typeof revokeAccessSchema>;
 
 export const revokeAccessFSchema: FastifySchema = {
-    params: z.object({
-        id: z.string().uuid(),
-    }),
-    body: revokeAccessSchema,
+    params: todoIdParamsSchema,
+    body: revokeAccessSchema
 };

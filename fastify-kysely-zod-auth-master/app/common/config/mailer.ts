@@ -1,6 +1,5 @@
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
@@ -10,17 +9,17 @@ const transporter = nodemailer.createTransport({
     secure: process.env.SMTP_SECURE === "true",
     auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
+        pass: process.env.SMTP_PASS
+    }
 });
 
 export async function sendEmailNotification(email: string, todoTitle: string) {
     const mailOptions = {
-        from: process.env.SMTP_USER, 
-        to: email, 
+        from: process.env.SMTP_USER,
+        to: email,
         subject: "Доступ к задаче",
         text: `Вам был предоставлен доступ к задаче "${todoTitle}".`,
-        html: `<p>Вам был предоставлен доступ к задаче <strong>${todoTitle}</strong>.</p>`,
+        html: `<p>Вам был предоставлен доступ к задаче <strong>${todoTitle}</strong>.</p>`
     };
 
     try {

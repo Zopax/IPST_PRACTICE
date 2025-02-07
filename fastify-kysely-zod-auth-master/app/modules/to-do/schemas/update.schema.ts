@@ -7,5 +7,5 @@ const updateTodoSchema = z.object({
     isCompleted: z.boolean().optional()
 });
 
-export type updateTodoSchema = z.infer<typeof updateTodoSchema>;
+export type UpdateTodoSchema = z.infer<typeof updateTodoSchema>;
 export const updateTodoFSchema: FastifySchema = { body: updateTodoSchema };

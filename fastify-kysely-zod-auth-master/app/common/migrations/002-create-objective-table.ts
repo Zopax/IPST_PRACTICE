@@ -8,8 +8,8 @@ export async function up(db: Kysely<any>) {
         .addColumn("description", "text")
         .addColumn("creatorId", "uuid", (col) => col.references("users.id").onDelete("cascade").notNull())
         .addColumn("notifyAt", "timestamp")
-        .addColumn("createdAt", "timestamp", (col) => col.notNull())
-        .addColumn("updatedAt", "timestamp", (col) => col.notNull())
+        .addColumn("createdAt", "timestamp", (col) => col.notNull().defaultTo(sql`now()`))
+        .addColumn("updatedAt", "timestamp", (col) => col.notNull().defaultTo(sql`now()`))
         .addColumn("isCompleted", "boolean", (col) => col.notNull())
         .execute();
 }

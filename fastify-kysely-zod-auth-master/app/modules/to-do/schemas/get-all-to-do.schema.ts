@@ -16,6 +16,5 @@ export const getAllTodosSchema = z.object({
     offset: z.coerce.number().int().nonnegative().optional().default(0)
 });
 
-
 export type getAllTodosSchema = z.infer<typeof getAllTodosSchema>;
 export const getAllTodosFSchema: FastifySchema = { querystring: getAllTodosSchema };
