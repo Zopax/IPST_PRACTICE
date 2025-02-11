@@ -1,5 +1,5 @@
 import { z } from "zod";
 
-export const uuidSchema = z.string().uuid();
+export const uuidSchema = z.object({ id: z.string().uuid() });
 
-export type UuidSchema = z.infer<typeof uuidSchema>;
+export type uuidSchemaType = z.infer<typeof uuidSchema>;

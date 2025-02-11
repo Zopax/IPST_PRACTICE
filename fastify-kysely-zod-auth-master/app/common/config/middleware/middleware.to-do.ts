@@ -6,7 +6,7 @@ import { CustomException } from "../../exceptions/custom-exception";
 import { sqlCon } from "../kysely-config";
 import { getTodoCreatorId } from "./sql";
 
-export async function checkTodoOwnership(req: FastifyRequest<{ Params: { id: string } }>, rep: FastifyReply, done: HookHandlerDoneFunction) {
+export async function checkTodoOwnership(req: FastifyRequest<{ Params: { id: string } }>, _rep: FastifyReply, done: HookHandlerDoneFunction) {
     const { id } = req.params;
     const userId = req.user.id as string;
 
@@ -23,9 +23,9 @@ export async function checkTodoOwnership(req: FastifyRequest<{ Params: { id: str
     done();
 }
 
-export async function checkTodoAccess(req: FastifyRequest<{ Params: { id: string } }>, rep: FastifyReply, done: HookHandlerDoneFunction) {
+export async function checkTodoAccess(req: FastifyRequest<{ Params: { id: string } }>, _rep: FastifyReply, done: HookHandlerDoneFunction) {
     const { id } = req.params;
-    const userId = req.user.id as string;
+    const userId = req.user.id!;
 
     const todo = await getTodoCreatorId(sqlCon, id);
 
@@ -33,24 +33,10 @@ export async function checkTodoAccess(req: FastifyRequest<{ Params: { id: string
         throw new CustomException(HttpStatusCode.NOT_FOUND, "Todo not found");
     }
 
-    const isCreator = todo.creatorId === userId;
-    const hasAccess = isCreator ? true : await todoRepository.hasAccessToObjective(sqlCon, id, userId);
+    const hasAccess = await todoRepository.hasAccessToObjective(sqlCon, id, userId);
 
     if (!hasAccess) {
         throw new AccessDeniedException();
-    }
-
-    done();
-}
-
-export async function checkTodoAccessForSharing(req: FastifyRequest<{ Params: { id: string }; Body: { userId: string } }>, rep: FastifyReply, done: HookHandlerDoneFunction) {
-    const { id } = req.params;
-    const { userId } = req.body;
-
-    const hasAccess = await todoRepository.hasAccessToObjective(sqlCon, id, userId);
-
-    if (hasAccess) {
-        throw new CustomException(HttpStatusCode.CONFLICT, "This user already has access to the objective.");
     }
 
     done();

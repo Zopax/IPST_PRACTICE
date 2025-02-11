@@ -1,6 +1,6 @@
 import { ExpressionBuilder, type Insertable, type Kysely, type Selectable, Transaction } from "kysely";
 import { DB, Objectives, UserObjectiveShares } from "../../common/types/kysely/db.type";
-import { getAllTodosSchema } from "./schemas/get-all-to-do.schema";
+import { getAllTodosSchemaType } from "./schemas/get-all-to-do.schema";
 
 type InsertableObjectiveRowType = Insertable<Objectives>;
 type UserObjectiveSharesRowType = Insertable<UserObjectiveShares>;
@@ -36,7 +36,7 @@ export async function remove(con: Kysely<DB> | Transaction<DB>, id: string) {
     return await con.deleteFrom("objectives").where("id", "=", id).returningAll().executeTakeFirstOrThrow();
 }
 
-export async function getAllWithQuery(con: Kysely<DB>, userId: string, queryParams: getAllTodosSchema): Promise<SelectableObjectiveRowType[]> {
+export async function getAllWithQuery(con: Kysely<DB>, userId: string, queryParams: getAllTodosSchemaType): Promise<SelectableObjectiveRowType[]> {
     const conditions = (eb: ExpressionBuilder<DB, "objectives">) => {
         const expressions = [eb("creatorId", "=", userId)];
 
@@ -57,14 +57,12 @@ export async function getAllWithQuery(con: Kysely<DB>, userId: string, queryPara
 }
 
 export async function shareTodo(con: Kysely<DB> | Transaction<DB>, entity: UserObjectiveSharesRowType) {
-    try {
-        return await con.insertInto("user_objective_shares").values(entity).returningAll().executeTakeFirstOrThrow();
-    } catch (error) {
-        if (error) {
-            throw new Error("This user already has access to the objective.");
-        }
-        throw error;
-    }
+    return await con
+        .insertInto("user_objective_shares")
+        .values(entity)
+        .onConflict((oc) => oc.column("id").doNothing())
+        .returningAll()
+        .executeTakeFirstOrThrow();
 }
 
 export async function revokeAccess(con: Kysely<DB>, objectiveId: string, userId: string) {
