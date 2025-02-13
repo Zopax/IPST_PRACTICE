@@ -1,4 +1,4 @@
-import type { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import * as todoRepository from "../../../modules/to-do/repository.to-do";
 import { HttpStatusCode } from "../../enum/http-status-code";
 import { AccessDeniedException } from "../../exceptions/access-denied.exception";
@@ -6,7 +6,7 @@ import { CustomException } from "../../exceptions/custom-exception";
 import { sqlCon } from "../kysely-config";
 import { getTodoCreatorId } from "./sql";
 
-export async function checkTodoOwnership(req: FastifyRequest<{ Params: { id: string } }>, _rep: FastifyReply, done: HookHandlerDoneFunction) {
+export async function checkTodoOwnership(req: FastifyRequest<{ Params: { id: string } }>, _rep: FastifyReply) {
     const { id } = req.params;
     const userId = req.user.id as string;
 
@@ -19,11 +19,9 @@ export async function checkTodoOwnership(req: FastifyRequest<{ Params: { id: str
     if (todo.creatorId !== userId) {
         throw new AccessDeniedException();
     }
-
-    done();
 }
 
-export async function checkTodoAccess(req: FastifyRequest<{ Params: { id: string } }>, _rep: FastifyReply, done: HookHandlerDoneFunction) {
+export async function checkTodoAccess(req: FastifyRequest<{ Params: { id: string } }>, _rep: FastifyReply) {
     const { id } = req.params;
     const userId = req.user.id!;
 
@@ -38,6 +36,4 @@ export async function checkTodoAccess(req: FastifyRequest<{ Params: { id: string
     if (!hasAccess) {
         throw new AccessDeniedException();
     }
-
-    done();
 }
