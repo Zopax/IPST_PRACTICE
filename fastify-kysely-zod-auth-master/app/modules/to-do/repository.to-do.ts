@@ -60,7 +60,7 @@ export async function shareTodo(con: Kysely<DB> | Transaction<DB>, entity: UserO
     return await con
         .insertInto("user_objective_shares")
         .values(entity)
-        .onConflict((oc) => oc.column("id").doNothing())
+        .onConflict((oc) => oc.columns(["objectiveId", "userId"]).doNothing())
         .returningAll()
         .executeTakeFirstOrThrow();
 }
